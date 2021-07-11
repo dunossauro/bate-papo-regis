@@ -33,7 +33,7 @@ python app/__init__.py
 ### Atividade
 
 1. Fazer um método para buscar um usuário.
-2. Fazer os dois endpoints que estão faltando:
+2. Fazer os 3 endpoints que estão faltando:
     * listar
     * pegar um usuário e
     * deletar
