@@ -16,7 +16,8 @@ As pastas `dia_00*rg` foram refeitas pelo Regis.
 
 As anotações a seguir fazem parte dos assuntos discutidos nas conversas.
 
-## Dia 01
+
+## Dia 001
 
 
 poetry com Python 3.9
@@ -100,4 +101,10 @@ Se você deixar `idade: int = 42` no `UserSchema`, então vai quebrar o último 
 ### Atividade
 
 Fazer um CRUD sem banco.
+
+
+
+## Dia 002
+
+Leia o [README do dia 002](dia_002_rg/README.md)
 
