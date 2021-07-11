@@ -11,8 +11,9 @@ def create_app():
     # Application factory
     app = FastAPI()
 
-    from .database import session, User
     from sqlalchemy.future import select
+
+    from .database import User, session
 
     @app.post('/user/add/', status_code=201)
     async def create_user(user: UserSchema):

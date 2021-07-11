@@ -8,6 +8,8 @@ authors = ["Regis Santos"]
 python = "^3.9"
 fastapi = "^0.65.2"
 uvicorn = "^0.14.0"
+aiosqlite = "^0.17.0"
+SQLAlchemy = "1.4.18"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"

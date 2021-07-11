@@ -1,114 +1,83 @@
-'''
+"""
 - Application Factory
-'''
-from fastapi import FastAPI
+
+Documentação dos testes: https://fastapi.tiangolo.com/tutorial/testing/?h=testing
+requests do client: https://docs.python-requests.org/en/master/
+"""
 from fastapi.testclient import TestClient
 from pytest import fixture
+from sqlalchemy.future import select
+from sqlalchemy.orm import Session
 
 from app import create_app
+from app.database import Base, User
 
 
 @fixture
 def client():
-    '''Cliente do FastAPI.'''
+    """Cliente do FastAPI. """
     app = create_app()
-    return TestClient(app)
+
+    # Conexão sincrona no banco para criar as tabelas
+    from sqlalchemy import create_engine
+    engine = create_engine('sqlite:///./db.db')
+
+    with engine.begin() as conn:
+        Base.metadata.create_all(conn)
+
+        yield TestClient(app)  # cliente do FastAPI
+
+        Base.metadata.drop_all(conn)
 
 
-def test_create_app(client):
-    assert isinstance(create_app(), FastAPI)
+@fixture
+def engine():
+    from sqlalchemy import create_engine
+    return create_engine('sqlite:///./db.db')
 
 
-def test_home_deve_retornar_200(client):
-    response = client.get('/')
-    assert response.status_code == 200
+@fixture
+def user():
+    return {
+        'nome': 'Regis',
+        'email': '@@'
+    }
 
 
-def test_home_deve_retornar_ola_regis(client):
-    # response é da api do requests.
-    response = client.get('/')
-    assert response.json() == {'message': 'Ola Regis'}
+def test_create_user_deve_retornar_201(client, user):
+    response = client.post('/user/add/', json=user)
+    assert response.status_code == 201
 
 
-def test_pessoas_deve_retornar_200_quando_chamar_com_eduardo(client):
-    response = client.get('/pessoa/eduardo')
-    assert response.status_code == 200
+def test_create_user_deve_retornar_o_usuario_de_entrada(client, user):
+    response = client.post('/user/add/', json=user)
+    assert response.json() == user
 
 
-def test_pessoas_deve_retornar_chamou_eduardo_quando_chamar_com_eduardo(client):
-    response = client.get('/pessoa/eduardo')
-    assert response.json() == {'message': 'Você chamou eduardo'}
-
-
-# def test_busca_por_id_deve_retornar_404(client):
-#     response = client.get('/id/42')
-#     assert response.status_code == 404
-
-def test_busca_por_id_1_deve_retornar_404(client):
-    response = client.get('/id/1')
+def test_patch_user_deve_retornar_404_quando_usuario_nao_existir(client, user):
+    response = client.patch('/user/1/', json=user)
     assert response.status_code == 404
 
 
-def test_busca_por_id_1_deve_retornar_nao_tem_1(client):
-    response = client.get('/id/1')
-    assert response.json() == {'detail': 'Não tem 1'}
+def test_patch_user_deve_retornar_200_quando_usuario_alterar_o_user(client, user):
+    response = client.post('/user/add/', json=user)
 
+    user['email'] = 'batatinha@frita'
 
-def test_busca_por_id_2_deve_retornar_200(client):
-    response = client.get('/id/2')
+    response = client.patch('/user/1/', json=user)
     assert response.status_code == 200
 
 
-def test_busca_por_id_2_deve_retornar_regis(client):
-    response = client.get('/id/2')
-    assert response.json() == {'name': 'regis'}
+def test_patch_user_deve_alterar_o_registro_no_banco(client, user, engine):
+    # docs.sqlalchemy.org/en/14/orm/session_basics.html#basics-of-using-a-session
+    client.post('/user/add/', json=user)
 
+    user['email'] = 'batatinha@frita'
 
-def test_inserir_usuario_no_banco_deve_retornar_201(client):
-    user = {
-        'id': 1,
-        'nome': 'Regis',
-        'idade': 42,
-        'email': 'regis@email.com',
-    }
-    response = client.post('/inserir/', json=user)
-    assert response.status_code == 201
+    client.patch('/user/1/', json=user)
 
-
-def test_inserir_entidade_não_processável_retorna_422(client):
-    user = {
-        'nome': 'Regis',
-        'email': 'regis@email.com',
-    }
-    response = client.post('/inserir/', json=user)
-    assert response.status_code == 422
-
-
-def test_pessoas_deve_retornar_200(client):
-    response = client.get('/pessoas')
-    assert response.status_code == 200
-
-
-def test_pessoas_deve_retornar_lista_de_pessoas(client):
-    response = client.get('/pessoas')
-    pessoas = [
-        {"id": 1, "nome": "Regis", "idade": 42, "email": "regis@email.com"}
-    ]
-    assert response.json() == pessoas
-
-
-def test_get_pessoas_deve_retornar_200(client):
-    response = client.get('/pessoas/1')
-    assert response.status_code == 200
-
-
-def test_get_pessoas_deve_retornar_um_dict(client):
-    response = client.get('/pessoas/1')
-    pessoa = {"id": 1, "nome": "Regis", "idade": 42, "email": "regis@email.com"}
-    assert response.json() == pessoa
-
-
-def test_pessoas_add_deve_retornar_201(client):
-    pessoa = {"id": 1, "nome": "Regis", "idade": 42, "email": "regis@email.com"}
-    response = client.post('/pessoas/add/', json=pessoa)
-    assert response.status_code == 201
+    with Session(engine) as s:
+        query = s.execute(
+            select(User).where(User.id == 1)
+        )
+        assert query.scalar().email == 'batatinha@frita'
