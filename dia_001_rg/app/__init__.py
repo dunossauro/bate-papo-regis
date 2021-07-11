@@ -1,6 +1,7 @@
-from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException
 from typing import List
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
