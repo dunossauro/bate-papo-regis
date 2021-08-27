@@ -4,13 +4,12 @@
 Documentação dos testes: https://fastapi.tiangolo.com/tutorial/testing/?h=testing
 requests do client: https://docs.python-requests.org/en/master/
 """
+from app import create_app
+from app.database import Base, User
 from fastapi.testclient import TestClient
 from pytest import fixture
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
-
-from app import create_app
-from app.database import Base, User
 
 
 @fixture

@@ -5,9 +5,9 @@ Documentação dos testes: https://fastapi.tiangolo.com/tutorial/testing/?h=test
 requests do client: https://docs.python-requests.org/en/master/
 """
 from app import create_app
-from pytest import fixture
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from pytest import fixture
 
 
 @fixture

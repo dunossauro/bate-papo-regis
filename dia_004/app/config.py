@@ -1,12 +1,13 @@
+from os import getenv
+from typing import Literal, Union
+
 from pydantic import (
     BaseSettings,
-    PostgresDsn,
-    parse_obj_as,
-    ValidationError,
     Field,
+    PostgresDsn,
+    ValidationError,
+    parse_obj_as
 )
-from typing import Union, Literal
-from os import getenv
 
 
 class Base(BaseSettings):

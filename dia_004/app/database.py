@@ -1,15 +1,10 @@
 # Core
 # ORM <-
 
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import (
-    declarative_base, sessionmaker
-)
-from sqlalchemy.ext.asyncio import (
-    AsyncSession, create_async_engine
-)
-
 from config import env
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 engine = create_async_engine(env.database_url)
 session = sessionmaker(

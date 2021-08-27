@@ -3,13 +3,13 @@ Injeção de dependência:
 - fastapi: https://fastapi.tiangolo.com/tutorial/dependencies/
 - Genérico: https://python-dependency-injector.ets-labs.org/index.html
 """
-from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from .database import session, User
+from .database import User, session
 
 app = FastAPI()
 

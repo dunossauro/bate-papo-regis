@@ -6,8 +6,8 @@ requests do client: https://docs.python-requests.org/en/master/
 """
 from app import create_app
 from app.database import Base, User
-from pytest import fixture
 from fastapi.testclient import TestClient
+from pytest import fixture
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 

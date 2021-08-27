@@ -3,10 +3,10 @@ Injeção de dependência:
 - fastapi: https://fastapi.tiangolo.com/tutorial/dependencies/
 - Genérico: https://python-dependency-injector.ets-labs.org/index.html
 """
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 
-from .database import session, User
+from .database import User, session
 
 
 class UserSchema(BaseModel):
