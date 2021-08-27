@@ -14,6 +14,10 @@ class UserSchemaResponse(UserSchema):
         orm_mode = True
 
 
+class BatatinhaResponse(BaseModel):
+    xpto: list[UserSchemaResponse]
+
+
 def create_app():
     # Application factory
     app = FastAPI()
@@ -22,6 +26,13 @@ def create_app():
 
     from .database import User, session
 
+    @app.get('/user/', response_model=BatatinhaResponse, status_code=200)
+    async def user_list():
+        async with session() as s:
+            query = await s.execute(select(User))
+            result = query.scalars().all()
+        return {'xpto': result}
+
     @app.get('/user/{user_id}/', response_model=UserSchemaResponse, status_code=200)
     async def get_user(user_id):
         async with session() as s:
@@ -29,6 +40,8 @@ def create_app():
                 select(User).where(User.id == user_id)
             )
 
+            # scalar é um objeto do ORM (SQLAlchemy)
+            # retorna um registro
             result = query.scalar()
 
         if not result:
@@ -69,5 +82,25 @@ def create_app():
             )
 
         return {'message': str(result)}
+
+    @app.delete('/user/{user_id}/', status_code=204)
+    async def user_delete(user_id):
+        async with session() as s:
+            query = await s.execute(
+                select(User).where(User.id == user_id)
+            )
+
+            # scalar é um objeto do ORM (SQLAlchemy)
+            # retorna um registro
+            result = query.scalar()
+
+            if not result:
+                raise HTTPException(
+                    status_code=404, detail=f'Not Found {user_id}'
+                )
+            await s.delete(result)
+            await s.commit()
+
+        return {'message': 'deletado com sucesso'}
 
     return app

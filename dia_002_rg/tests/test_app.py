@@ -20,7 +20,7 @@ def client():
 
     # Conexão sincrona no banco para criar as tabelas
     from sqlalchemy import create_engine
-    engine = create_engine('sqlite:///./db_test.db')
+    engine = create_engine('sqlite:///./db.db')
 
     with engine.begin() as conn:
         Base.metadata.create_all(conn)
@@ -33,7 +33,7 @@ def client():
 @fixture
 def engine():
     from sqlalchemy import create_engine
-    return create_engine('sqlite:///./db_test.db')
+    return create_engine('sqlite:///./db.db')
 
 
 @fixture
@@ -104,3 +104,31 @@ def test_get_user_deve_retornar_usuario_quando_chamar_id_1(client, user, userid)
 
     response = client.get('/user/1/')
     assert response.json() == userid
+
+
+def test_user_list_deve_retornar_200(client, user):
+    client.post('/user/add/', json=user)
+
+    response = client.get('/user/')
+    assert response.status_code == 200
+
+
+def test_user_list_deve_retornar_lista_de_usuarios(client, user, userid):
+    client.post('/user/add/', json=user)
+
+    response = client.get('/user/')
+    assert response.json() == {'xpto': [userid]}
+
+
+def test_user_delete_deve_retornar_204(client, user):
+    client.post('/user/add/', json=user)
+
+    response = client.delete('/user/1/')
+    assert response.status_code == 204
+
+
+def test_user_delete_deve_retornar_uma_lista_vazia(client, user):
+    client.post('/user/add/', json=user)
+
+    response = client.delete('/user/1/')
+    assert response.json() == {'message': 'deletado com sucesso'}
