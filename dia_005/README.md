@@ -1,3 +1,15 @@
+# Rodando a aplicação
+
+```
+poetry shell
+ENV=test uvicorn app:create_app
+```
+
+endpoint
+
+http://localhost:8000
+http://localhost:8000/index
+
 # Configuração inicial do banco
 
 1. Se for async, `alembic init -t async <diretorio>`
